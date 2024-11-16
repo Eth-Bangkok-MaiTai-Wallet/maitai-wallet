@@ -97,7 +97,7 @@ export default function Home() {
             height: '70vh',    // Take 70% of viewport height
             display: 'flex',
             flexDirection: 'column',
-            backgroundColor: '#f8f9fa',
+            // backgroundColor: '#f8f9fa',
             borderRadius: '12px',
             boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
             overflow: "hidden",
