@@ -168,7 +168,7 @@ const extractTokenData = (messages: string, classificationResult: string) =>
 const tokenList = async (token_symbol: string, token_name: string) => {
   console.log("RUNNING TOKEN LOOKUP", token_symbol);
   const response = await fetch(
-    `https://eth.blockscout.com/api/v2/tokens?q=${token_symbol}%20${token_name}&type=ERC-20`,
+    `https://base.blockscout.com/api/v2/tokens?q=${token_symbol}%20${token_name}&type=ERC-20`,
     {
       headers: {
         'accept': 'application/json'

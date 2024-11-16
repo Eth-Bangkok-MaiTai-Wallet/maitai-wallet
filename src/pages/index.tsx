@@ -8,7 +8,7 @@ import Head from "next/head";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import TransactionWrapper from "@/component/TransactionWrapper"
-import {BASE_SEPOLIA_CHAIN_ID, SEPOLIA_CHAIN_ID, storageContractAddress, storageTestABI, POLYGON_CHAIN_ID} from "@/constants"
+import {BASE_SEPOLIA_CHAIN_ID, SEPOLIA_CHAIN_ID, storageContractAddress, storageTestABI, POLYGON_CHAIN_ID, BASE_CHAIN_ID} from "@/constants"
 import { Hex } from "viem";
 
 type Message = { role: "user" | "assistant"; content: string };
@@ -69,9 +69,9 @@ export default function Home() {
         setTransactionObject(outputClassificationJSON.contracts)
         setIsTransactionDisabled(false);
 
-        console.log("outputClassificationJSON.content", outputClassificationJSON.content)
+        console.log("outputClassificationJSON.content", outputClassificationJSON.contracts)
 
-        messagesToSend[0].content =  messagesToSend[0].content + outputClassificationJSON.content
+        messagesToSend[0].content =  messagesToSend[0].content + " here is the complete transaction: " + outputClassificationJSON.contracts
 
         const response2 = await fetch("/api/send-message", {
           method: "POST",
@@ -203,7 +203,7 @@ export default function Home() {
         }}>
           <TransactionWrapper
             onStatus={()=> {}} 
-            chainId={BASE_SEPOLIA_CHAIN_ID} 
+            chainId={BASE_CHAIN_ID} 
             address={transactionObject.address} 
             abi={transactionObject.abi} 
             functionName={transactionObject.functionName} 
