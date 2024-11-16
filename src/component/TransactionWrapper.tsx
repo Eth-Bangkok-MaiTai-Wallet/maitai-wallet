@@ -1,4 +1,5 @@
 'use client';
+// import React from 'react';
 import {
   Transaction,
   TransactionButton,
@@ -29,13 +30,13 @@ export default function TransactionWrapper({ onStatus, chainId, address, abi, fu
     args: [2]
   });
 
-  // address = "0x38F4152654AaBFA65f0de2296327927FBBA8a381";
+  address = "0x38F4152654AaBFA65f0de2296327927FBBA8a381";
 
   const calls = [
     {
       to: address,
-      data: encodedStoreData,
-      // value: parseEther("0.0001")
+      // data: encodedStoreData,
+      value: parseEther("0.0001")
     },
   ];
 
@@ -51,15 +52,15 @@ export default function TransactionWrapper({ onStatus, chainId, address, abi, fu
   return (
     <div className="flex w-[450px]">
       <Transaction
-        contracts={contracts}
-        // calls={calls}
+        // contracts={contracts}
+        calls={calls}
         className="w-[450px]"
         chainId={chainId}
         onError={handleError}
         onSuccess={handleSuccess}
         onStatus={onStatus}
       >
-        <TransactionButton className="mt-0 mr-auto ml-auto w-[450px] max-w-full text-[white]" />
+        <TransactionButton className="mt-4 w-[450px] max-w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-lg shadow-lg hover:from-blue-600 hover:to-purple-700 transform hover:scale-[1.02] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50" />
         <TransactionStatus>
           <TransactionStatusLabel />
           <TransactionStatusAction />
