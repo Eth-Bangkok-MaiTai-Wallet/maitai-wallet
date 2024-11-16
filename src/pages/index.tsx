@@ -16,6 +16,21 @@ export default function Home() {
 
   const abortController = useRef<AbortController | null>(null);
 
+  async function extractJSONFromStream(stream: any) {
+    const reader = stream.getReader();
+    const decoder = new TextDecoder();
+    let result = "";
+  
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      result += decoder.decode(value, { stream: true });
+    }
+  
+    // Parse the JSON string
+    return JSON.parse(result);
+  }
+
   const handleSend = async (message: string) => {
     try {
       const userMessage: Message = { role: "user", content: message };
@@ -26,6 +41,30 @@ export default function Home() {
 
       abortController.current = new AbortController();
 
+      const response2 = await fetch("/api/classify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(messagesToSend),
+        // signal: abortController.current.signal,
+      });
+
+      const outputClassification = response2.body
+
+      const outputClassificationJSON = await extractJSONFromStream(outputClassification)
+
+      console.log("outputClassificationJSON", outputClassificationJSON)
+
+      console.log("outputClassificationJSON.content", outputClassificationJSON.content)
+
+      messagesToSend[0].content =  messagesToSend[0].content + outputClassificationJSON.content
+
+
+      // const msg2: Message = { role: "user", content: outputClassificationJSON }
+
+      // const messagesToSend2 = [...messagesToSend, msg2]
+
+      console.log("Messages to send 2: ", messagesToSend)
+
       const response = await fetch("/api/send-message", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -35,12 +74,13 @@ export default function Home() {
 
       console.log("AI Response: ", response)
 
-      const response2 = fetch("/api/classify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(messagesToSend),
-        // signal: abortController.current.signal,
-      });
+
+      // const response2 = fetch("/api/classify", {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify(messagesToSend),
+      //   // signal: abortController.current.signal,
+      // });
 
       console.log("Classification Response: ", response2)
 
@@ -130,3 +170,5 @@ export default function Home() {
     </>
   );
 }
+
+

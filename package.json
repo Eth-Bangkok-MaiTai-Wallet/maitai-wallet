@@ -20,7 +20,6 @@
     "@coinbase/onchainkit": "^0.35.5",
     "@emotion/react": "11.10.8",
     "@emotion/styled": "11.10.8",
-    "@modelfusion/serpapi-tool": "^0.11.0",
     "@mui/icons-material": "5.15.5",
     "@mui/material": "5.12.2",
     "eciesjs": "^0.3.16",

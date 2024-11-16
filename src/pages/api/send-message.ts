@@ -65,6 +65,8 @@ const sendMessage = async (request: Request): Promise<Response> => {
 
   const parsedData = requestSchema.safeParse(await request.json());
 
+  console.log("parsedData", parsedData)
+
   if (parsedData.success === false) {
     return new Response(
       JSON.stringify({

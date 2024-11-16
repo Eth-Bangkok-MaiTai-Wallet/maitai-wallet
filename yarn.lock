@@ -490,13 +490,6 @@
     semver "^7.5.4"
     uuid "^9.0.1"
 
-"@modelfusion/serpapi-tool@^0.11.0":
-  version "0.11.0"
-  resolved "https://registry.yarnpkg.com/@modelfusion/serpapi-tool/-/serpapi-tool-0.11.0.tgz#02ae4d9c23732c2b717531613f587e699ca78af3"
-  integrity sha512-YPMqhHc6MTG7HYAEViZ2+p6QUb/cBw8X71oIFgIIEoLjGOyLbPU7Z/ZTc5ZyXCuFdFSbpA6qPuPXxViuYMg2ug==
-  dependencies:
-    serpapi "^2.0.0"
-
 "@motionone/animation@^10.15.1", "@motionone/animation@^10.18.0":
   version "10.18.0"
   resolved "https://registry.yarnpkg.com/@motionone/animation/-/animation-10.18.0.tgz#868d00b447191816d5d5cf24b1cafa144017922b"
@@ -3996,11 +3989,6 @@ semver@^7.3.8, semver@^7.5.4:
   version "7.6.3"
   resolved "https://registry.yarnpkg.com/semver/-/semver-7.6.3.tgz#980f7b5550bc175fb4dc09403085627f9eb33143"
   integrity sha512-oVekP1cKtI+CTDvHWYFUcMtsK/00wmAEfyqKfNdARm8u1wNVhSgaX7A8d4UuIlUI5e84iEwOhs7ZPYRmzU9U6A==
-
-serpapi@^2.0.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/serpapi/-/serpapi-2.1.0.tgz#ff7b7926f93e4c0f23c63d0dce639bf7c4875d8b"
-  integrity sha512-iXydBe7yLEwSYlHUNG9QRlZfFxtbxpQ0kZf7HDmRC4vbzhUzBW9rU+zOw2K6bcA2D6/qTCXivtCB/hnZJFZNTQ==
 
 set-blocking@^2.0.0:
   version "2.0.0"
