@@ -69,9 +69,9 @@ export default function Home() {
         setTransactionObject(outputClassificationJSON.contracts)
         setIsTransactionDisabled(false);
 
-        console.log("outputClassificationJSON.content", outputClassificationJSON.content)
+        console.log("outputClassificationJSON.content", outputClassificationJSON.contracts)
 
-        messagesToSend[0].content =  messagesToSend[0].content + outputClassificationJSON.content
+        messagesToSend[0].content =  messagesToSend[0].content + JSON.stringify(outputClassificationJSON.contracts)
 
         const response2 = await fetch("/api/send-message", {
           method: "POST",
