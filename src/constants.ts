@@ -2,6 +2,7 @@ export const BASE_SEPOLIA_CHAIN_ID = 84532;
 export const ARB_SEPOLIA_CHAIN_ID = 421614;
 export const SEPOLIA_CHAIN_ID = 11155111;
 export const POLYGON_CHAIN_ID = 137;
+export const BASE_CHAIN_ID = 8453;
 export const mintContractAddress = '0xA3e40bBe8E8579Cd2619Ef9C6fEA362b760dac9f';
 export const promptContractAddress = '0x696c83111a49eBb94267ecf4DDF6E220D5A80129';
 // export const storageContractAddress = '0x66bd1D59F0BA7205289780A5E79fbeE9a607E003'//base
