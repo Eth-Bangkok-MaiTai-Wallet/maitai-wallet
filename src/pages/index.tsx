@@ -8,13 +8,21 @@ import Head from "next/head";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import TransactionWrapper from "@/component/TransactionWrapper"
-import {SEPOLIA_CHAIN_ID, storageContractAddress, storageTestABI, POLYGON_CHAIN_ID} from "@/constants"
+import {BASE_SEPOLIA_CHAIN_ID, SEPOLIA_CHAIN_ID, storageContractAddress, storageTestABI, POLYGON_CHAIN_ID} from "@/constants"
+import { Hex } from "viem";
 
 type Message = { role: "user" | "assistant"; content: string };
 
 export default function Home() {
   const [messages, setMessages] = useState<Array<Message>>([]);
   const [isSending, setIsSending] = useState<boolean>(false);
+  const [isTransactionDisabled, setIsTransactionDisabled] = useState(true);
+  const [transactionObject, setTransactionObject] = useState({
+    "address" : "" as Hex,
+    "abi" : [] as any,
+    "functionName" : "",
+    "args": []
+  } );
 
   const abortController = useRef<AbortController | null>(null);
 
@@ -43,51 +51,50 @@ export default function Home() {
 
       abortController.current = new AbortController();
 
-      const response2 = await fetch("/api/classify", {
+      let streamInput;
+
+      const response = await fetch("/api/classify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(messagesToSend),
         // signal: abortController.current.signal,
       });
 
-      const outputClassification = response2.body
+      const outputClassification = response.body
 
       const outputClassificationJSON = await extractJSONFromStream(outputClassification)
-
       console.log("outputClassificationJSON", outputClassificationJSON)
+      
+      if(outputClassificationJSON.contracts){
+        setTransactionObject(outputClassificationJSON.contracts)
+        setIsTransactionDisabled(false);
 
-      console.log("outputClassificationJSON.content", outputClassificationJSON.content)
+        console.log("outputClassificationJSON.content", outputClassificationJSON.content)
 
-      messagesToSend[0].content =  messagesToSend[0].content + outputClassificationJSON.content
+        messagesToSend[0].content =  messagesToSend[0].content + outputClassificationJSON.content
 
+        const response2 = await fetch("/api/send-message", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(messagesToSend),
+          signal: abortController.current.signal,
+        });
 
-      // const msg2: Message = { role: "user", content: outputClassificationJSON }
+        console.log("Messages to send 2: ", messagesToSend)
+        console.log("AI Response: ", response2)
 
-      // const messagesToSend2 = [...messagesToSend, msg2]
-
-      console.log("Messages to send 2: ", messagesToSend)
-
-      const response = await fetch("/api/send-message", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(messagesToSend),
-        signal: abortController.current.signal,
-      });
-
-      console.log("AI Response: ", response)
-
-
-      // const response2 = fetch("/api/classify", {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify(messagesToSend),
-      //   // signal: abortController.current.signal,
-      // });
-
-      console.log("Classification Response: ", response2)
+        streamInput = response2.body;
+      } else {
+        streamInput = new ReadableStream({
+          start(controller) {
+            controller.enqueue('Please provide more context!');
+            controller.close();
+          }
+        });
+      }
 
       const textDeltas = readEventSourceStream({
-        stream: response.body!,
+        stream: streamInput!,
         schema: zodSchema(z.string()),
       });
 
@@ -194,13 +201,14 @@ export default function Home() {
           display: 'flex',
           justifyContent: 'center'
         }}>
-          <TransactionWrapper 
+          <TransactionWrapper
             onStatus={()=> {}} 
-            chainId={SEPOLIA_CHAIN_ID} 
-            address={storageContractAddress} 
-            abi={storageTestABI} 
-            functionName='store' 
-            args={[7]} 
+            chainId={BASE_SEPOLIA_CHAIN_ID} 
+            address={transactionObject.address} 
+            abi={transactionObject.abi} 
+            functionName={transactionObject.functionName} 
+            args={transactionObject.args}
+            disabled={isTransactionDisabled}
           />
         </Box>
       </Box>
