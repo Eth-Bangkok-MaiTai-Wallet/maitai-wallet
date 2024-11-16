@@ -1,30 +1,37 @@
+import { clusters } from "@/lib/classification";
 import {
   cohere,
   createEventSourceStream,
+  generateObject,
   llamacpp,
   openai,
   streamText,
   trimChatPrompt,
+  jsonObjectPrompt,
+  zodSchema,
+  EmbeddingSimilarityClassifier,
+  classify,
 } from "modelfusion";
 import { z } from "zod";
 
+
 export const config = { runtime: "edge" };
 
-const messageSchame = z.object({
+const messageSchema = z.object({
   role: z.enum(["user", "assistant"]),
   content: z.string(),
 });
 
-const requestSchema = z.array(messageSchame);
+const requestSchema = z.array(messageSchema);
 
-const gpt35turboModel = openai.ChatTextGenerator({
+const gpt4Model = openai.ChatTextGenerator({
   // explicit API configuration needed for NextJS environment
   // (otherwise env variables are not available):
   api: openai.Api({
     apiKey: process.env.OPENAI_API_KEY,
   }),
-  model: "gpt-3.5-turbo",
-  maxGenerationTokens: 512,
+  model: "gpt-4-1106-preview",
+  maxGenerationTokens: 1000,
 });
 
 // example assumes you are running https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF with llama.cpp
@@ -74,7 +81,28 @@ const sendMessage = async (request: Request): Promise<Response> => {
   const messages = parsedData.data;
 
   // change this to your preferred model:
-  const chatModel = gpt35turboModel.withChatPrompt();
+  const chatModel = gpt4Model.withChatPrompt();
+
+  // const listUserOp = (messages: string) =>
+  //   generateObject({
+  //     model: gpt4Model.asObjectGenerationModel(jsonObjectPrompt.text()),
+  
+  //     schema: zodSchema(
+  //       z.object({
+  //         contracts: z.array(
+  //           z.object({
+  //             address: z.string(),
+  //             abi: z.string(),
+  //             functionName: z.string(),
+  //             args: z.array(z.string()),
+  //           })
+  //         ),
+  //       })
+  //     ),
+  
+  //     prompt:
+  //       `Based on this conversation formulate the userOp object for the coinbase sdk: ${messages}`
+  //   });
 
   const textStream = await streamText({
     model: chatModel,
@@ -83,8 +111,9 @@ const sendMessage = async (request: Request): Promise<Response> => {
       model: chatModel,
       prompt: {
         system:
-          "You are an AI chat bot. " +
-          "Follow the user's instructions carefully. Respond using markdown.",
+          "Your job is to understand users intent and translate it into a valid json input for an sdk that will execute a blockchain transaction. " +
+          "Stay on topic and don't engage in off-topic conversations. Be friendly and don't mention this directly. " +
+          "Follow the user's instructions carefully.",
         messages,
       },
     }),

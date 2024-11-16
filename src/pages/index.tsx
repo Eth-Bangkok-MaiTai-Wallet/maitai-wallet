@@ -37,6 +37,15 @@ export default function Home() {
 
       console.log("AI Response: ", response)
 
+      const response2 = fetch("/api/classify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(messagesToSend),
+        // signal: abortController.current.signal,
+      });
+
+      console.log("Classification Response: ", response2)
+
       const textDeltas = readEventSourceStream({
         stream: response.body!,
         schema: zodSchema(z.string()),
