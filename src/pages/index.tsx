@@ -7,6 +7,8 @@ import { readEventSourceStream } from "modelfusion-experimental/browser";
 import Head from "next/head";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
+import TransactionWrapper from "@/component/TransactionWrapper"
+import {SEPOLIA_CHAIN_ID, storageContractAddress, storageTestABI, POLYGON_CHAIN_ID} from "@/constants"
 
 type Message = { role: "user" | "assistant"; content: string };
 
@@ -87,45 +89,80 @@ export default function Home() {
         <title>ModelFusion chat example</title>
       </Head>
       <Box
-        component="main"
         sx={{
-          position: "relative",
-          flexGrow: 1,
-          height: "100%",
-          overflow: "hidden",
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          minHeight: '100vh',
+          padding: '2rem',
         }}
       >
         <Box
+          component="main"
           sx={{
             position: "relative",
-            maxHeight: "100%",
-            overflowY: "auto",
+            width: '100%',
+            maxWidth: '800px', // Limit maximum width
+            height: '70vh',    // Take 70% of viewport height
+            display: 'flex',
+            flexDirection: 'column',
+            // backgroundColor: '#f8f9fa',
+            borderRadius: '12px',
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+            overflow: "hidden",
           }}
         >
-          <Box sx={{ height: "100%", overflowY: "auto", marginTop: 2 }}>
-            {messages.map((message, index) => (
-              <ChatMessageView
-                key={index}
-                message={{ role: message.role, content: message.content }}
-              />
-            ))}
-            <Box sx={{ height: "160px" }} />
+          <Box
+            sx={{
+              position: "relative",
+              maxHeight: "100%",
+              overflowY: "auto",
+              padding: '1rem',
+            }}
+          >
+            <Box sx={{ height: "100%", overflowY: "auto" }}>
+              {messages.map((message, index) => (
+                <ChatMessageView
+                  key={index}
+                  message={{ role: message.role, content: message.content }}
+                />
+              ))}
+              <Box sx={{ height: "160px" }} />
+            </Box>
           </Box>
+
+          {isSending ? (
+            <ChatInputArea>
+              <Button
+                variant="outlined"
+                sx={{ width: "100%" }}
+                onClick={handleStopGenerate}
+              >
+                Stop Generating
+              </Button>
+            </ChatInputArea>
+          ) : (
+            <ChatMessageInput onSend={handleSend} />
+          )}
         </Box>
 
-        {isSending ? (
-          <ChatInputArea>
-            <Button
-              variant="outlined"
-              sx={{ width: "100%" }}
-              onClick={handleStopGenerate}
-            >
-              Stop Generating
-            </Button>
-          </ChatInputArea>
-        ) : (
-          <ChatMessageInput onSend={handleSend} />
-        )}
+        {/* Transaction Wrapper with styled button */}
+        <Box sx={{ 
+          mt: 3, 
+          width: '100%', 
+          maxWidth: '800px',
+          display: 'flex',
+          justifyContent: 'center'
+        }}>
+          <TransactionWrapper 
+            onStatus={()=> {}} 
+            chainId={SEPOLIA_CHAIN_ID} 
+            address={storageContractAddress} 
+            abi={storageTestABI} 
+            functionName='store' 
+            args={[7]} 
+          />
+        </Box>
       </Box>
     </>
   );
