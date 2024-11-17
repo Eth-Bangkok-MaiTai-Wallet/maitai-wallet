@@ -10,6 +10,7 @@ import { z } from "zod";
 import TransactionWrapper from "@/component/TransactionWrapper"
 import {BASE_SEPOLIA_CHAIN_ID, SEPOLIA_CHAIN_ID, storageContractAddress, storageTestABI, POLYGON_CHAIN_ID, BASE_CHAIN_ID, usdc_base_abi} from "@/constants"
 import { Hex } from "viem";
+import { env } from "process";
 
 type Message = { role: "user" | "assistant"; content: string };
 
@@ -206,8 +207,8 @@ export default function Home() {
             chainId={BASE_CHAIN_ID} 
             address="0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"//{transactionObject.address} 
             abi={usdc_base_abi} 
-            functionName="transfer"//transactionObject.functionName} 
-            args={["0x597334879D2F21c753139BF6572C1A8aF1b06f5E", 10000]}//transactionObject.args}
+            functionName="transfer"//{transactionObject.functionName} 
+            args={["0x38F4152654AaBFA65f0de2296327927FBBA8a381", 10000 ]}//{transactionObject.args}
             disabled={false}
           />
         </Box>

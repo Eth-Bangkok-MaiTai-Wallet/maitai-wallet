@@ -24,21 +24,21 @@ export default function TransactionWrapper({ onStatus, chainId, address, abi, fu
     },
   ] as unknown as ContractFunctionParameters[];
 
-  const encodedStoreData = encodeFunctionData({
-    abi: abi,
-    functionName: functionName,
-    args: args
-  });
+  // const encodedStoreData = encodeFunctionData({
+  //   abi: abi,
+  //   functionName: functionName,
+  //   args: args
+  // });
 
-  // address = "0x38F4152654AaBFA65f0de2296327927FBBA8a381";
+  // // address = "0x38F4152654AaBFA65f0de2296327927FBBA8a381";
 
-  const calls = [
-    {
-      to: address,
-      data: encodedStoreData,
-      // value: parseEther("0.0001")
-    },
-  ];
+  // const calls = [
+  //   {
+  //     to: address,
+  //     data: encodedStoreData,
+  //     // value: parseEther("0.0001")
+  //   },
+  // ];
 
   const handleError = (err: TransactionError) => {
     console.log(err)
@@ -52,8 +52,8 @@ export default function TransactionWrapper({ onStatus, chainId, address, abi, fu
   return (
     <div className="flex w-[450px]">
       <Transaction
-        // contracts={contracts}
-        calls={calls}
+        contracts={contracts}
+        // calls={calls}
         className="w-[450px]"
         chainId={chainId}
         onError={handleError}

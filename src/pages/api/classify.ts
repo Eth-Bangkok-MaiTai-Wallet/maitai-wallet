@@ -4,6 +4,7 @@ import { z } from "zod";
 import { NextResponse } from "next/server";
 import tokenListEthMain from "@/lib/tokenList.json";
 import tokenListBase from "@/lib/tokenListBase.json";
+import { parseUnits, parseEther } from "viem";
 
 const gpt4Model = openai.ChatTextGenerator({
   // explicit API configuration needed for NextJS environment
@@ -82,7 +83,7 @@ export default async function classifyMessage (req: any, res: any) {
     let classificationResult = null;
 
     let prompt = ""
-    const chain = "Ethereum Mainnet"
+    const chain = process.env.CHAIN_ID
 
     switch (result) {
         case "eth_transfer_to_address":
@@ -102,22 +103,46 @@ export default async function classifyMessage (req: any, res: any) {
               openai.ChatMessage.system(
                 `You are handling a erc20 token transfer on behalf of the user on chain ${chain}` +
                 `This is the user request: ${lastMessage.content}.` + 
-                "Find out which token the user wants to transfer and respond with the contract address only" +
-                `Use the token list for reference: ${JSON.stringify(tokenList)}`
+                "Find the contract address. Extract the amount of the token to be transferred from the user request" +
+                `Use the token list to find the correct contract address of the erc20 token to be transferred: ${JSON.stringify(tokenList)}` +
+                "Respond in machine readable JSON format ONLY with no other text in the following schema: {contractAddress: string, amount: string}" +
+                "Provide the amount in the exact same format as the user inputs it, including decimals"
               ),
             ],
           });
 
-          const token = await verifyToken(text).catch(e => console.log(e));
+          console.log("TOKEN LIST: ", tokenList);
 
-          const abi = await getAbi(text).catch(e => console.log(e));
+          const jsonStart = text.indexOf('{');
+          const jsonEnd = text.lastIndexOf('}');
+          const jsonText = text.slice(jsonStart, jsonEnd + 1);
+          const parsedJson = JSON.parse(jsonText);
+          console.log("TEXT: ", parsedJson);
+
+          // const token = await verifyToken(parsedJson.contractAddress).catch(e => console.log(e));
+
+          const amount = tokenList!.some(token => 
+            token.address.toLowerCase() === parsedJson.contractAddress.toLowerCase() && 
+            token.symbol.toLowerCase() === 'usdc'
+          ) 
+            ? parseUnits(parsedJson.amount, 6) // USDC has 8 decimals
+            : parseEther(parsedJson.amount); // Default to 18 decimals for other tokens
+
+          const abi = await getAbi(parsedJson.contractAddress).catch(e => console.log(e));
+          //TODO lookup decimals in the list
+
+          const token = await verifyToken(text).catch(e => console.log(e));
+          
+          console.log("Token: ", token)
+
 
           prompt = `You are handling a erc20 token transfer on behalf of the user on chain ${chain}` +
             `This is the user request: ${lastMessage.content}.` + 
             "Find out which token the user wants to transfer, what amount and to which address." +
             "The user might send a token name, symbol or contact address, make sure to not confuse the token address with the receiver address" +
             "A search tool provided information on the token and abi. Evaluate if it is accurate information and if so, use it." +
-            `Token info: ${token}` +
+            `Token address: ${parsedJson.contractAddress}` +
+            `Amount: ${amount}` +
             `Abi info: ${abi}` +
             "If there is no abi provided, define a standard erc20 abi"
 
@@ -231,13 +256,15 @@ const verifyToken = async (tokenAddress: string) => {
 const getAbi = async (contractAddress: string) => {
   console.log("RUNNING TOKEN LOOKUP", contractAddress);
   const response = await fetch(
-    `https://eth.blockscout.com/api/v2/smart-contracts//${contractAddress}`,
+    `https://base.blockscout.com/api/v2/smart-contracts//${contractAddress}`,
     {
       headers: {
         'accept': 'application/json'
       }
     }
   );
+
   const data = await response.json();
+  
   return data.abi;
 };
