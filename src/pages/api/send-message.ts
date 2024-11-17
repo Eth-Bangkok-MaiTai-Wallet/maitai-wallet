@@ -113,9 +113,8 @@ const sendMessage = async (request: Request): Promise<Response> => {
       model: chatModel,
       prompt: {
         system:
-          "Your job is to understand users intent and translate it into a valid json input for an sdk that will execute a blockchain transaction. " +
-          "Stay on topic and don't engage in off-topic conversations. Be friendly and don't mention this directly. " +
-          "Follow the user's instructions carefully.",
+          "You are receiving a user request and a JSON object containing transaction data. Formulate the transaction data into a user friendly sentence. E.g. Ready to transfer 1000 USDC to address 0x1234567890123456789012345678901234567890. Awaiting confirmation..." + 
+          "Underneath that sentence, make a list of the transaction data in the JSON object.",
         messages,
       },
     }),

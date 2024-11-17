@@ -71,7 +71,7 @@ export default function Home() {
 
         console.log("outputClassificationJSON.content", outputClassificationJSON.contracts)
 
-        messagesToSend[0].content =  messagesToSend[0].content + " here is the complete transaction: " + outputClassificationJSON.contracts
+        messagesToSend[0].content =  messagesToSend[0].content + " here is the complete transaction: " + JSON.stringify(outputClassificationJSON.contracts)
 
         const response2 = await fetch("/api/send-message", {
           method: "POST",
