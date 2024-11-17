@@ -8,7 +8,7 @@ import Head from "next/head";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import TransactionWrapper from "@/component/TransactionWrapper"
-import {BASE_SEPOLIA_CHAIN_ID, SEPOLIA_CHAIN_ID, storageContractAddress, storageTestABI, POLYGON_CHAIN_ID, BASE_CHAIN_ID} from "@/constants"
+import {BASE_SEPOLIA_CHAIN_ID, SEPOLIA_CHAIN_ID, storageContractAddress, storageTestABI, POLYGON_CHAIN_ID, BASE_CHAIN_ID, usdc_base_abi} from "@/constants"
 import { Hex } from "viem";
 
 type Message = { role: "user" | "assistant"; content: string };
@@ -204,11 +204,11 @@ export default function Home() {
           <TransactionWrapper
             onStatus={()=> {}} 
             chainId={BASE_CHAIN_ID} 
-            address={transactionObject.address} 
-            abi={transactionObject.abi} 
-            functionName={transactionObject.functionName} 
-            args={transactionObject.args}
-            disabled={isTransactionDisabled}
+            address="0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"//{transactionObject.address} 
+            abi={usdc_base_abi} 
+            functionName="transfer"//transactionObject.functionName} 
+            args={["0x597334879D2F21c753139BF6572C1A8aF1b06f5E", 10000]}//transactionObject.args}
+            disabled={false}
           />
         </Box>
       </Box>
